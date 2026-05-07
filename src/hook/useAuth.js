@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation'; // ✅ import router
+import { useRouter } from 'next/navigation';
 
 export const useAuth = () => {
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -9,7 +9,7 @@ export const useAuth = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const router = useRouter(); // ✅ define router
+  const router = useRouter();
 
   const login = async (email, password) => {
     setLoading(true);
@@ -34,7 +34,6 @@ export const useAuth = () => {
 
       localStorage.setItem('token', token);
 
-      // ✅ Navigation here (as you want)
       router.replace('/new-purchase');
 
       return true;
@@ -47,7 +46,10 @@ export const useAuth = () => {
   };
 
   const getToken = () => {
-    return localStorage.getItem('token');
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('token');
+    }
+    return null;
   };
 
   return { login, loading, error, getToken };
