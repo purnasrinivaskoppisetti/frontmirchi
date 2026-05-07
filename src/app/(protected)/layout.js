@@ -3,14 +3,19 @@ import Footer from '@/components/Footer';
 
 export default function ProtectedLayout({ children }) {
     return (
-        <div >
+        <div className="min-h-screen bg-slate-100">
+
+            {/* HEADER */}
             <Header />
-            <div >
-                <main>
-                    {children}
-                </main>
-            </div>
+
+            {/* PAGE CONTENT */}
+            <main className="pt-20 pb-24">
+                {children}
+            </main>
+
+            {/* FOOTER */}
             <Footer />
+
         </div>
     );
 }
