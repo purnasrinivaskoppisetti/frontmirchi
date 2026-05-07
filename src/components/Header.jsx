@@ -14,9 +14,10 @@ export default function Header() {
   };
 
   return (
-    <div className="bg-red-700 text-white py-3 px-4 flex justify-between items-center">
+    <div className=" bg-red-700 text-white py-3 px-4 ">
 
-      {/* TITLE */}
+     <div className='w-[80%] m-auto flex justify-between items-center'>
+       {/* TITLE */}
       <h1 className="font-bold text-lg">
         Jai Sriram
       </h1>
@@ -29,6 +30,7 @@ export default function Header() {
         Logout
       </button>
 
+     </div>
     </div>
   );
 }

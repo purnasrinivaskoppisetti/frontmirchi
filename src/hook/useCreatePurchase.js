@@ -9,12 +9,13 @@ export const useNewPurchase = () => {
   const getTodayDate = () => new Date().toISOString().split('T')[0];
 
   const { getToken } = useAuth();
-
+const token = getToken();
   const [loading, setLoading] = useState(false);
 
   const [name, setName] = useState('');
   const [mobile, setMobile] = useState('');
-  const [crop, setCrop] = useState('');
+  const [grade, setGrade] = useState('');
+  const [crop, setCrop] = useState('mirchi');
   const [price, setPrice] = useState('');
   const [date, setDate] = useState(getTodayDate());
 
@@ -70,10 +71,10 @@ export const useNewPurchase = () => {
   };
 
   const handleSave = async () => {
-    setLoading(true);
+  
 
     try {
-      const token = getToken();
+      
       if (!token) return alert('Login again');
 
       const payload = {
@@ -122,8 +123,23 @@ export const useNewPurchase = () => {
     } catch (err) {
       alert(err.message);
     } finally {
-      setLoading(false);
+      
     }
+  };
+  const removeBag = (indexToRemove) => {
+
+    if (bags.length === 1) return;
+
+    const updated = bags.filter(
+      (_, index) => index !== indexToRemove
+    );
+
+    const renamed = updated.map((item, index) => ({
+      ...item,
+      bag: `Bag ${index + 1}`,
+    }));
+
+    setBags(renamed);
   };
 
   return {
@@ -131,6 +147,8 @@ export const useNewPurchase = () => {
     name, setName,
     mobile, setMobile,
     crop, setCrop,
+    grade,
+    setGrade,
     price, setPrice,
     date, setDate,
     range1, setRange1,
@@ -144,5 +162,6 @@ export const useNewPurchase = () => {
     notes, setNotes,
     handleSave,
     showSuccess, setShowSuccess,
+    removeBag,
   };
 };

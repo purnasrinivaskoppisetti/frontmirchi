@@ -35,7 +35,7 @@ export const useAuth = () => {
       localStorage.setItem('token', token);
 
       // ✅ Navigation here (as you want)
-      router.replace('/dashboard');
+      router.replace('/new-purchase');
 
       return true;
     } catch (err) {
