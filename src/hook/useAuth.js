@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export const useAuth = () => {
-  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+  const BASE_URL = 'https://ptltirumalatraders.online/';
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
