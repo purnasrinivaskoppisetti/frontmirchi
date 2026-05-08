@@ -21,10 +21,12 @@ export const useNewPurchase = () => {
   const [price, setPrice] = useState('');
   const [date, setDate] = useState(getTodayDate());
 
+  // DEDUCTION INPUTS
   const [range1, setRange1] = useState('');
   const [range2, setRange2] = useState('');
   const [range3, setRange3] = useState('');
 
+  // BAGS
   const [bags, setBags] = useState([
     {
       bag: 'Bag 1',
@@ -40,48 +42,71 @@ export const useNewPurchase = () => {
 
   const [showSuccess, setShowSuccess] = useState(false);
 
-  // GET RANGE DEDUCTION
-  const getDeduction = (weight) => {
-    if (weight >= 1 && weight <= 49)
+  // ----------------------------------------
+  // GET EXTRA DEDUCTION BASED ON RANGE
+  // ----------------------------------------
+
+  const getRangeDeduction = (weight) => {
+    // 46 - 49
+    if (weight >= 46 && weight <= 49) {
       return parseFloat(range1) || 0;
+    }
 
-    if (weight >= 50 && weight <= 99)
+    // 50 - 60
+    if (weight >= 50 && weight <= 60) {
       return parseFloat(range2) || 0;
+    }
 
-    if (weight >= 100 && weight <= 200)
+    // 60+
+    if (weight > 60) {
       return parseFloat(range3) || 0;
+    }
 
     return 0;
   };
 
+  // ----------------------------------------
   // HANDLE BAG WEIGHT CHANGE
+  // ----------------------------------------
+
   const handleWeightChange = (value, index) => {
-    const updated = bags.map((item, i) => {
+    const updatedBags = bags.map((item, i) => {
       if (i !== index) return item;
 
       const weight = parseFloat(value) || 0;
 
-      // RANGE DEDUCTION
-      const rangeDeduction = getDeduction(weight);
+      // DEFAULT 1 KG DEDUCTION FOR EVERY BAG
+      const defaultDeduction = weight > 0 ? 1 : 0;
 
-      // DEFAULT 1 KG + RANGE DEDUCTION
-      const totalDeduction = 1 + rangeDeduction;
+      // EXTRA RANGE DEDUCTION
+      const extraDeduction =
+        getRangeDeduction(weight);
+
+      // TOTAL DEDUCTION
+      const totalDeduction =
+        defaultDeduction + extraDeduction;
+
+      // FINAL NET WEIGHT
+      const netWeight =
+        weight > 0
+          ? Math.max(weight - totalDeduction, 0)
+          : 0;
 
       return {
         ...item,
         weight: value,
         deduction: totalDeduction,
-        netWeight:
-          weight > 0
-            ? weight - totalDeduction
-            : 0,
+        netWeight,
       };
     });
 
-    setBags(updated);
+    setBags(updatedBags);
   };
 
+  // ----------------------------------------
   // ADD BAG
+  // ----------------------------------------
+
   const addBag = () => {
     setBags((prev) => [
       ...prev,
@@ -94,7 +119,10 @@ export const useNewPurchase = () => {
     ]);
   };
 
+  // ----------------------------------------
   // REMOVE BAG
+  // ----------------------------------------
+
   const removeBag = (indexToRemove) => {
     if (bags.length === 1) return;
 
@@ -102,15 +130,20 @@ export const useNewPurchase = () => {
       (_, index) => index !== indexToRemove
     );
 
-    const renamed = updated.map((item, index) => ({
-      ...item,
-      bag: `Bag ${index + 1}`,
-    }));
+    const renamed = updated.map(
+      (item, index) => ({
+        ...item,
+        bag: `Bag ${index + 1}`,
+      })
+    );
 
     setBags(renamed);
   };
 
+  // ----------------------------------------
   // SAVE PURCHASE
+  // ----------------------------------------
+
   const handleSave = async () => {
     try {
       setLoading(true);
@@ -129,12 +162,21 @@ export const useNewPurchase = () => {
 
         bags: bags.map((b, i) => ({
           bag_number: i + 1,
-          gross_weight: b.netWeight,
+
+          // ORIGINAL WEIGHT
+          gross_weight:
+            parseFloat(b.weight) || 0,
+
+          // TOTAL DEDUCTION
           deduction: b.deduction,
+
+          // FINAL WEIGHT AFTER DEDUCTION
+          net_weight: b.netWeight,
         })),
 
         payment: {
-          amount_paid: parseFloat(amountPaid) || 0,
+          amount_paid:
+            parseFloat(amountPaid) || 0,
           payment_mode: paymentMode,
           remarks: '',
         },
@@ -147,7 +189,8 @@ export const useNewPurchase = () => {
         {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type':
+              'application/json',
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(payload),
@@ -158,14 +201,15 @@ export const useNewPurchase = () => {
 
       if (!res.ok) {
         throw new Error(
-          data?.message || 'Failed to save purchase'
+          data?.message ||
+            'Failed to save purchase'
         );
       }
 
-      // SUCCESS POPUP
+      // SUCCESS
       setShowSuccess(true);
 
-      // RESET FORM
+      // RESET
       setName('');
       setMobile('');
       setGrade('');
@@ -175,6 +219,10 @@ export const useNewPurchase = () => {
       setPaymentMode('cash');
       setNotes('');
 
+      setRange1('');
+      setRange2('');
+      setRange3('');
+
       setBags([
         {
           bag: 'Bag 1',
@@ -183,7 +231,6 @@ export const useNewPurchase = () => {
           deduction: 0,
         },
       ]);
-
     } catch (err) {
       alert(err.message);
     } finally {
