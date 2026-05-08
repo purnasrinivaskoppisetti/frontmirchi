@@ -68,22 +68,32 @@ const token = getToken();
 };
 
   const handleWeightChange = (value, index) => {
-    const updated = bags.map((item, i) => {
-      if (i !== index) return item;
 
-      const weight = parseFloat(value) || 0;
-      const deduction = getDeduction(weight);
+  const updated = bags.map((item, i) => {
 
-      return {
-        ...item,
-        weight: value,
-        deduction,
-        netWeight: weight - deduction,
-      };
-    });
+    if (i !== index) return item;
 
-    setBags(updated);
-  };
+    const weight = parseFloat(value) || 0;
+
+    // RANGE DEDUCTION
+    const rangeDeduction = getDeduction(weight);
+
+    // DEFAULT 1 KG + RANGE DEDUCTION
+    const totalDeduction = 1 + rangeDeduction;
+
+    return {
+      ...item,
+      weight: value,
+      deduction: totalDeduction,
+      netWeight:
+        weight > 0
+          ? weight - totalDeduction
+          : 0,
+    };
+  });
+
+  setBags(updated);
+};
 
   const addBag = () => {
     setBags((prev) => [
