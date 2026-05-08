@@ -39,6 +39,33 @@ const token = getToken();
     if (weight >= 100 && weight <= 200) return parseFloat(range3) || 0;
     return 0;
   };
+  const handleWeightChange = (value, index) => {
+ 
+  const updated = bags.map((item, i) => {
+ 
+    if (i !== index) return item;
+ 
+    const weight = parseFloat(value) || 0;
+ 
+    // RANGE DEDUCTION
+    const rangeDeduction = getDeduction(weight);
+ 
+    // DEFAULT 1 KG + RANGE DEDUCTION
+    const totalDeduction = 1 + rangeDeduction;
+ 
+    return {
+      ...item,
+      weight: value,
+      deduction: totalDeduction,
+      netWeight:
+        weight > 0
+          ? weight - totalDeduction
+          : 0,
+    };
+  });
+ 
+  setBags(updated);
+};
 
   const handleWeightChange = (value, index) => {
     const updated = bags.map((item, i) => {
